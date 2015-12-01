@@ -41,6 +41,7 @@
                                           (> (node-cost l destination)
                                              (node-cost r destination)))))
         (visited (make-hash-table :test #'eq))
+        (visited-list nil)
         (discovered (make-hash-table :test #'eq))
         (nodes (make-array (list (map-height map) (map-width map))
                            :initial-element nil)))
