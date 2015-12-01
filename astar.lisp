@@ -77,6 +77,9 @@
                           (when (and (gethash (node-original neighbor)
                                               discovered)
                                      (< new-cost (node-best-cost neighbor)))
+                            ;; Our priority queue doesn't allow changing
+                            ;; priorities, so if we find a new best cost for a
+                            ;; node that's in the queue, we have to duplicate it
                             (setf 
                              neighbor (make-instance
                                        'node
