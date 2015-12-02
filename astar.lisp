@@ -41,7 +41,6 @@
                                           (> (node-cost l destination)
                                              (node-cost r destination)))))
         (visited (make-hash-table :test #'eq))
-        (visited-list nil)
         (discovered (make-hash-table :test #'eq))
         (nodes (make-array (list (map-height map) (map-width map))
                            :initial-element nil)))
@@ -101,3 +100,14 @@
             (maybe-add-neighbor (1+ current-x) current-y))
            (when (> current-x 0)
             (maybe-add-neighbor (1- current-x) current-y)))))))
+
+(defun %test-case-path (name)
+  (cl-fad:merge-pathnames-as-file
+   (asdf:system-source-directory :maze-solver)
+   "test/"
+   (concatenate 'string name ".maze")))
+
+(5am:test no-solution
+  (let* ((map (parse-map-file (%test-case-path "no-solution")))
+         (path (find-path map (map-start-point map) (map-end-point map))))
+    (5am:is (null path))))
