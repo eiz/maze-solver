@@ -111,3 +111,10 @@
   (let* ((map (parse-map-file (%test-case-path "no-solution")))
          (path (find-path map (map-start-point map) (map-end-point map))))
     (5am:is (null path))))
+
+(5am:test finds-solutions
+  (dolist (test '("complex" "fake-shortcut-mirror" "fork" "trivial"
+                  "equidistant" "fake-shortcut" "mean" "side-path" "zero"))
+    (let* ((map (parse-map-file (%test-case-path test)))
+           (path (find-path map (map-start-point map) (map-end-point map))))
+      (5am:is (not (null path))))))
