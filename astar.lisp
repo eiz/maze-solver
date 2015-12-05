@@ -6,7 +6,8 @@
           :initform (error "Point is required."))
    (best-cost :accessor node-best-cost :initform 'infinity)
    (best-source :accessor node-best-source)
-   (original :accessor node-original :initarg :original)))
+   (original :accessor node-original :initarg :original)
+   (serial :accessor node-serial :initform 0)))
 
 (defun manhattan-distance (lhs rhs)
   (+ (abs (- (car lhs) (car rhs)))
@@ -38,11 +39,16 @@
 (defun find-path (map source destination)
   (let ((queue (make-instance 'priority-queue
                               :comparer (lambda (l r)
-                                          (> (node-cost l destination)
-                                             (node-cost r destination)))))
+                                          (let ((lc (node-cost l destination))
+                                                (rc (node-cost r destination)))
+                                            (if (= lc rc)
+                                                (< (node-serial l)
+                                                   (node-serial r))
+                                                (> lc rc))))))
         (visited (make-hash-table :test #'eq))
         (visited-list nil)
         (total-spaces 0)
+        (next-serial 0)
         (discovered (make-hash-table :test #'eq))
         (nodes (make-array (list (map-height map) (map-width map))
                            :initial-element nil)))
@@ -95,6 +101,7 @@
                             (setf
                              (node-best-cost neighbor) new-cost
                              (node-best-source neighbor) (node-point current)
+                             (node-serial neighbor) (incf next-serial)
                              (gethash (node-original neighbor) discovered) t)
                             (priority-queue-insert queue neighbor)))))))
            (when (< current-y (1- (map-height map)))
@@ -119,7 +126,8 @@
 
 (5am:test finds-solutions
   (dolist (test '("complex" "fake-shortcut-mirror" "fork" "trivial"
-                  "equidistant" "fake-shortcut" "mean" "side-path" "zero"))
+                  "equidistant" "fake-shortcut" "mean" "side-path" "zero"
+                  "open"))
     (let* ((map (parse-map-file (%test-case-path test)))
            (path (find-path map (map-start-point map) (map-end-point map))))
       (5am:is (not (null path))))))

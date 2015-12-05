@@ -73,3 +73,11 @@
                      collect (priority-queue-pop q))))
       (5am:is (every #'= sorted '(36 12 9 8 7 5 4 2 1))))))
 
+(5am:test min-heap-sorts
+  (let ((q (make-instance 'priority-queue :comparer #'>)))
+    (dolist (i '(1 2 8 36 5 4 7 9 12))
+      (priority-queue-insert q i))
+    (let ((sorted (loop while (> 0 (priority-queue-size q))
+                     collect (priority-queue-pop q))))
+      (5am:is (every #'= sorted '(1 2 4 5 7 8 9 12 36))))))
+
