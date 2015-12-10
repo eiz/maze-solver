@@ -131,3 +131,5 @@
     (let* ((map (parse-map-file (%test-case-path test)))
            (path (find-path map (map-start-point map) (map-end-point map))))
       (5am:is (not (null path))))))
+
+
