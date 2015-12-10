@@ -1,32 +1,37 @@
 (in-package :maze-solver)
 
-(defun solve-maze-from-string (string)
+(defun solve-maze-from-string (string &key draw)
   (let ((map (parse-map-string string)))
-    (find-path map (map-start-point map) (map-end-point map))))
+    (multiple-value-bind (path visited-list total-nodes)
+        (find-path map (map-start-point map) (map-end-point map))
+      (values path visited-list total-nodes
+              (and draw (draw-solution map path visited-list))))))
 
-(defun solve-maze-from-file (path)
+(defun solve-maze-from-file (path &key draw)
   (let ((map (parse-map-file path)))
-    (find-path map (map-start-point map) (map-end-point map))))
+    (multiple-value-bind (path visited-list total-nodes)
+        (find-path map (map-start-point map) (map-end-point map))
+      (values path visited-list total-nodes
+              (and draw (draw-solution map path visited-list))))))
 
 (defun draw-solution (map path visited-list)
-  (let* ((data (map-data map))
-         (result (make-array (array-dimensions data) :initial-element #\Space)))
+  (let* ((data (map-data map)))
     (with-output-to-string (stream)
       (loop for y from 0 below (map-height map) do
            (progn
              (loop for x from 0 below (map-width map) do
-                  (progn
+                  (let ((char #\Space))
                     (when (eq (aref data y x) 'wall)
-                      (setf (aref result y x) #\#))
+                      (setf char #\#))
                     (when (find-if (lambda (point)
                                      (and (= (car point) x) (= (cdr point) y)))
                                    visited-list)
-                      (setf (aref result y x) #\?))
+                      (setf char #\?))
                     (when (find-if (lambda (point)
                                      (and (= (car point) x) (= (cdr point) y)))
                                    path)
-                      (setf (aref result y x) #\x))
-                    (princ (aref result y x) stream)))
+                      (setf char #\x))
+                    (princ char stream)))
              (princ #\Newline stream))))))
 
 (5am:test open-path-examines-optimal-node-count
