@@ -28,6 +28,8 @@
              (loop for x from 0 below (map-width map) do
                   (princ
                    (cond
+                     ((eq (aref data y x) 'start) #\S)
+                     ((eq (aref data y x) 'end) #\E)
                      ((eq (aref visited-map y x) 'in-path) #\x)
                      ((eq (aref visited-map y x) 'visited) #\?)
                      ((eq (aref data y x) 'wall) #\#)
